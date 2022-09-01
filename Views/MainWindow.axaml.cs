@@ -14,7 +14,7 @@ namespace SplitsAnalyzer.Views
 
             Opened += (object? e, EventArgs a) =>
             {
-                
+                DataContextCast.Initialize();
             };
         }
 

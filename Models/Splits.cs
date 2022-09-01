@@ -4,11 +4,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using ReactiveUI;
+using System.ComponentModel;
+using SplitsAnalyzer.ViewModels;
 
 namespace SplitsAnalyzer.Models
 {
-    internal class Splits
+    internal class Splits : INotifyPropertyChanged
     {
+        public event PropertyChangedEventHandler? PropertyChanged;
+        
         public string gameName;
         public string categoryName;
 
@@ -16,19 +21,41 @@ namespace SplitsAnalyzer.Models
 
         public List<Segment> segmentList;
 
-        internal Splits(string path)
+        public string lastError;
+
+        private MainWindowViewModel errorNotificationObj;
+
+        internal Splits(string path, MainWindowViewModel changeEventObj)
         {
             //in case the file is invalid
             gameName = "Not Found";
             categoryName = "Not Found";
             attemptCount = -1;
             segmentList = new();
+            
+            errorNotificationObj = changeEventObj;
+            
+            //parse XML
             try
             {
-#pragma warning disable CS8600, CS8602
-                //load and analyze document if possible
                 XmlDocument document = new();
-                document.Load(path);
+                
+#pragma warning disable CS8600, CS8602
+                //load document if possible
+                try
+                {
+                    document.Load(path);
+                    //if this is executed, document.Load(path) didn't cause an error
+                    ResetError();
+                }
+                catch (System.Exception e)
+                {
+                    if (e.Message != null)
+                    {
+                        Error(e.Message);
+                    }
+                }
+                
 
                 XmlNode gameNameNode = document.SelectSingleNode("//GameName");
                 if (gameNameNode != null)
@@ -104,12 +131,33 @@ namespace SplitsAnalyzer.Models
                         segmentList.Add(currentSegment);
                     }
                 }
+
+                XmlNodeList attemptNodeList = document.SelectNodes("//Attempt");
+                if (attemptNodeList != null)
+                {
+                    
+                }
 #pragma warning restore CS8600, CS8602
             }
             catch (NullReferenceException)
             {
-                
+                Error($"File {path} was missing a critical element, or there was a code error");
             }
+
+            //analyze data
+            
+        }
+
+        public void Error(string error)
+        {
+            lastError = error;
+            errorNotificationObj.UpdateSplitsError();
+        }
+
+        public void ResetError()
+        {
+            lastError = "";
+            errorNotificationObj.UpdateSplitsError();
         }
     }
     

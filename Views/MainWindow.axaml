@@ -16,6 +16,7 @@
 		<TextBlock Text="Splits Info:" DockPanel.Dock="Top" HorizontalAlignment="Center"/>
 		<TextBlock Text="{Binding GameName}" DockPanel.Dock="Top" HorizontalAlignment="Center"/>
 		<TextBlock Text="{Binding CategoryName}" DockPanel.Dock="Top" HorizontalAlignment="Center"/>
-		<TextBlock Text="{Binding AttemptCount}" HorizontalAlignment="Center"/>
+		<TextBlock Text="{Binding AttemptCount}" DockPanel.Dock="Top" HorizontalAlignment="Center"/>
+		<TextBlock Text="{Binding LastError}" DockPanel.Dock="Top" HorizontalAlignment="Center"></TextBlock>
 	</DockPanel>
 </Window>

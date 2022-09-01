@@ -13,19 +13,57 @@ namespace SplitsAnalyzer.ViewModels
     {
         public event PropertyChangedEventHandler? PropertyChanged;
         
+        public void Initialize()
+        {
+            splits = new(@"C:\Users\Us\source\repos\SplitsAnalyzer\bin\Debug\net6.0\testing.lss", this);
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(GameName)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CategoryName)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AttemptCount)));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(LastError)));
+        }
+
         public string GameName
         {
-            get { return splits.gameName; }
+            get 
+            {
+                if (splits != null)
+                    return splits.gameName;
+                else
+                    return "Not Yet Initialized";
+            }
         }
 
         public string CategoryName
         {
-            get { return splits.categoryName; }
+            get
+            {
+                if (splits != null)
+                    return splits.categoryName;
+                else
+                    return "Not Yet Initialized";
+            }
         }
 
         public string AttemptCount
         {
-            get { return  splits.attemptCount.ToString() + " Attempts"; }
+            get
+            {
+                if (splits != null)
+                    return splits.attemptCount + " attempts";
+                else
+                    return "Not Yet Initialized";
+            }
+        }
+
+        public string LastError
+        {
+            get
+            {
+                if (splits != null)
+                    return splits.lastError;
+                else
+                    return "Not Yet Initialized";
+            }
         }
         
         //file path to splits
@@ -36,13 +74,18 @@ namespace SplitsAnalyzer.ViewModels
             set 
             { 
                 this.RaiseAndSetIfChanged(ref splitsPath, value); 
-                splits = new(splitsPath);
+                splits = new(splitsPath, this);
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(GameName)));
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CategoryName)));
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AttemptCount)));
             }
         }
-        
-        internal Splits splits = new(@"C:\Users\Us\source\repos\SplitsAnalyzer\bin\Debug\net6.0\testing.lss");
+
+        public void UpdateSplitsError()
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(LastError)));
+        }
+
+        internal Splits splits;
     }
 }
