@@ -11,8 +11,10 @@ namespace SplitsAnalyzer.ViewModels
 {
     public class MainWindowViewModel : ViewModelBase, INotifyPropertyChanged
     {
+#pragma warning disable CS0108 // Member hides inherited member; missing new keyword
         public event PropertyChangedEventHandler? PropertyChanged;
-        
+#pragma warning restore CS0108 // Member hides inherited member; missing new keyword
+
         public void Initialize()
         {
             splits = new(@"C:\Users\Us\source\repos\SplitsAnalyzer\bin\Debug\net6.0\testing.lss", this);

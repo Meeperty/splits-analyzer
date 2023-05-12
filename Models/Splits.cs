@@ -21,7 +21,7 @@ namespace SplitsAnalyzer.Models
 
         public List<Segment> segmentList;
 
-        public string lastError;
+        public string lastError = "";
 
         private MainWindowViewModel errorNotificationObj;
 
