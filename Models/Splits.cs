@@ -7,6 +7,8 @@ using System.Xml;
 using ReactiveUI;
 using System.ComponentModel;
 using SplitsAnalyzer.ViewModels;
+using System.Xml.Serialization;
+using System.IO;
 
 namespace SplitsAnalyzer.Models
 {
@@ -55,88 +57,15 @@ namespace SplitsAnalyzer.Models
                         Error(e.Message);
                     }
                 }
-                
 
-                XmlNode gameNameNode = document.SelectSingleNode("//GameName");
-                if (gameNameNode != null)
-                {
-                    gameName = gameNameNode.InnerText;
-                }
+                XmlSerializer serializer = new XmlSerializer(typeof(Run));
 
-                XmlNode categoryNameNode = document.SelectSingleNode("//CategoryName");
-                if (categoryNameNode != null)
-                {
-                    categoryName = categoryNameNode.InnerText;
-                }
+                TimeSpan test = TimeSpan.Parse("00:00:00");
 
-                XmlNode attemptCountNode = document.SelectSingleNode("//AttemptCount");
-                if (attemptCountNode != null)
-                {
-                    attemptCount = int.Parse(attemptCountNode.InnerText);
-                }
+                var run = (Run)serializer.Deserialize(new FileStream(path, FileMode.Open));
+                if (run is null)
+                    Error("Run was null somehow idk");
 
-                XmlNodeList segmentNodeList = document.SelectNodes("//Segment");
-                if (segmentNodeList != null)
-                {
-                    for (int i = 0; i < segmentNodeList.Count; i++)
-                    {
-                        XmlNode currentSegmentNode = segmentNodeList.Item(i);
-                        
-                        //get segment name
-                        Segment currentSegment = new("Error, Name wasn't found");
-                        string name = currentSegmentNode["Name"].InnerText;
-                        if (name != null)
-                        {
-                            currentSegment = new("Name");
-                        }
-
-                        //get segment history
-                        currentSegment.segmentHistory = new();
-                        XmlNode segmentHistoryNode = currentSegmentNode["SegmentHistory"];
-                        XmlNodeList segmentTimesNodes = segmentHistoryNode.SelectNodes("Time");
-                        if (segmentTimesNodes.Count > 0)
-                        {
-                            for (int j = 0; j < segmentTimesNodes.Count; j++)
-                            {
-                                XmlNode currentTimeNode = segmentTimesNodes[j];
-                                
-                                int attemptId = int.Parse(currentTimeNode.Attributes["id"].Value);
-
-                                TimeSpan gameTime = new();
-                                TimeSpan realTime = new();
-
-                                XmlNode? gameTimeNode = currentTimeNode["GameTime"];
-                                XmlNode? realTimeNode = currentTimeNode["RealTime"];
-
-                                if (gameTimeNode != null)
-                                {
-                                    gameTime = TimeSpan.Parse(gameTimeNode.InnerText);
-                                    currentSegment.segmentHistory.Add(attemptId, gameTime);
-                                }
-                                else
-                                {
-                                    if (realTimeNode != null)
-                                    {
-                                        realTime = TimeSpan.Parse(realTimeNode.InnerText);
-                                        currentSegment.segmentHistory.Add(attemptId, realTime);
-                                    }
-                                    else
-                                    {
-                                        
-                                    }
-                                }
-                            }
-                        }
-
-                        segmentList.Add(currentSegment);
-                    }
-                }
-
-                XmlNodeList attemptNodeList = document.SelectNodes("//Attempt");
-                if (attemptNodeList != null)
-                {
-                    
-                }
 #pragma warning restore CS8600, CS8602
             }
             catch (NullReferenceException)
